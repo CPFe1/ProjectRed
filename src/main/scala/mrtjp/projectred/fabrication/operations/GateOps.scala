@@ -17,11 +17,20 @@ import mrtjp.projectred.fabrication.operations.CircuitOp.{isOnBorder, isOnEdge, 
 
 abstract class OpGateCommons(meta: Int) extends CircuitOp {
 
+  var rotation: Int = 0
+  var configuration: Int = 0
+
+  def getID: Int = meta
+
   def canPlace(circuit: IntegratedCircuit, point: Point): Boolean
   def findRot(circuit: IntegratedCircuit, start: Point, end: Point): Int
 
   override def checkOp(circuit: IntegratedCircuit, start: Point, end: Point) =
     canPlace(circuit, start) && circuit.getPart(start) == null
+
+  override def getRotation(): Int = rotation
+
+  override def getConfiguration(): Int = configuration
 
   override def writeOp(
       circuit: IntegratedCircuit,
@@ -38,8 +47,8 @@ abstract class OpGateCommons(meta: Int) extends CircuitOp {
 
   override def readOp(circuit: IntegratedCircuit, in: MCDataInput) {
     val point = Point(in.readByte(), in.readByte())
-    val rotation = in.readUByte()
-    val configuration = in.readUByte()
+    rotation = in.readUByte()
+    configuration = in.readUByte()
 
     if (circuit.getPart(point) == null && canPlace(circuit, point)) {
       val part = CircuitPart
@@ -64,7 +73,7 @@ abstract class OpGateCommons(meta: Int) extends CircuitOp {
     if (circuit.getPart(point) != null) return
 
     val t = orthoPartT(x, y, xSize, ySize, circuit.size, point.x, point.y)
-    doRender(t, rot, configuration)
+    doRender(t, rotation, configuration)
 
     renderHolo(
       x,
@@ -110,6 +119,11 @@ abstract class OpGateCommons(meta: Int) extends CircuitOp {
       width: Double,
       height: Double
   ) {
+    val t = orthoGridT(width, height) `with` new Translation(x, y, 0)
+    doRender(t, rotation, configuration)
+  }
+
+  override def renderImageStatic(x: Double, y: Double, width: Double, height: Double): Unit = {
     val t = orthoGridT(width, height) `with` new Translation(x, y, 0)
     doRender(t, 0, 0)
   }

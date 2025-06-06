@@ -18,6 +18,10 @@ class CircuitOpErase extends CircuitOp {
   override def checkOp(circuit: IntegratedCircuit, start: Point, end: Point) =
     true
 
+  override def getRotation(): Int = 0
+
+  override def getConfiguration(): Int = 0
+
   override def writeOp(
       circuit: IntegratedCircuit,
       start: Point,

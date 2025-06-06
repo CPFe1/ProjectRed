@@ -21,6 +21,10 @@ abstract class OpWire extends CircuitOp {
   override def checkOp(circuit: IntegratedCircuit, start: Point, end: Point) =
     circuit.getPart(start.x, start.y) == null
 
+  override def getRotation(): Int = 0
+
+  override def getConfiguration(): Int = 0
+
   override def writeOp(
       circuit: IntegratedCircuit,
       start: Point,
