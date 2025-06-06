@@ -20,8 +20,9 @@ class ICToolsetNode extends TNode {
   private var focused = false
   private var buttonOpMap = ListMap.empty[ButtonNode, CircuitOp]
 
-  private var leadingButton: ButtonNode = null
+  private var selectedButton: ButtonNode = null
   private var groupButton: ButtonNode = null
+  private var groupButtonOperation: CircuitOp = null
 
   def setup() {
     for (op <- opSet) {
@@ -38,12 +39,12 @@ class ICToolsetNode extends TNode {
     for ((b, i) <- buttonOpMap.keys.zipWithIndex)
       b.position = firstPoint.add(i * (buttonSize.width + buttonGap), 0)
 
-    leadingButton = buttonOpMap.head._1
+    selectedButton = buttonOpMap.head._1
+    groupButtonOperation = buttonOpMap.head._2
 
     groupButton = new IconButtonNode {
       override def drawButton(mouseover: Boolean) = {
-        val op = buttonOpMap(leadingButton)
-        op.renderImageStatic(
+        groupButtonOperation.renderImageStatic(
           position.x + 2,
           position.y + 2,
           size.width - 4,
@@ -53,9 +54,9 @@ class ICToolsetNode extends TNode {
     }
     groupButton.size = buttonSize
     groupButton.tooltipBuilder = {
-      _ += buttonOpMap(leadingButton).getOpName
+      _ += buttonOpMap(selectedButton).getOpName
     }
-    groupButton.clickDelegate = { () => leadingButton.clickDelegate() }
+    groupButton.clickDelegate = { () => selectedButton.clickDelegate() }
     addChild(groupButton)
   }
 
@@ -67,9 +68,9 @@ class ICToolsetNode extends TNode {
         case t: ICToolsetNode if t != this => t
       }
       .foreach(_.setUnfocused())
-    leadingButton.mouseoverLock = false
-    leadingButton = button
-    leadingButton.mouseoverLock = true
+    selectedButton.mouseoverLock = false
+    button.mouseoverLock = true
+    selectedButton = button
   }
 
   def setUnfocused() {
@@ -99,7 +100,7 @@ class ICToolsetNode extends TNode {
   private def createButtonFor(op: CircuitOp) = {
     val b = new IconButtonNode {
       override def drawButton(mouseover: Boolean) {
-        op.renderImage(
+        op.renderImageStatic(
           position.x + 2,
           position.y + 2,
           size.width - 4,
