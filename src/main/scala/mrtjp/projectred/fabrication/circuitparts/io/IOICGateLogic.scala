@@ -11,6 +11,10 @@ object IOICGateLogic {
     case ICGateDefinition.IOBundled.ordinal => new BundledIOICGateLogic(gate)
     case _ => throw new IllegalArgumentException("Invalid gate subID: " + subID)
   }
+
+  def cycleShape(shape: Int): Int = {
+    (shape + 1) % 3
+  }
 }
 
 abstract class IOICGateLogic(val gate: IOGateICPart)
@@ -31,8 +35,8 @@ abstract class IOICGateLogic(val gate: IOGateICPart)
     case 2 => 5
   }
 
-  override def cycleShape(gate: IOGateICPart) = {
-    gate.setShape((gate.shape + 1) % 3)
+  override def cycleShape(gate: IOGateICPart): Boolean = {
+    gate.setShape(IOICGateLogic.cycleShape(gate.shape))
     true
   }
 

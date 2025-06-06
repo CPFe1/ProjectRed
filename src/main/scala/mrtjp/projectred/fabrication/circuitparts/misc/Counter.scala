@@ -25,6 +25,12 @@ trait ICounterGuiLogic {
   def setCounterValue(gate: GateICPart, i: Int)
 }
 
+object Counter {
+  def cycleShape(shape: Int): Int = {
+    if (shape == 1) 0 else 1
+  }
+}
+
 
 class Counter(gate: SequentialGateICPart)
   extends SequentialICGateLogic(gate)
@@ -131,7 +137,7 @@ class Counter(gate: SequentialGateICPart)
   }
 
   override def cycleShape(gate: SequentialGateICPart) = {
-    gate.setShape(if (gate.shape == 1) 0 else 1)
+    gate.setShape(Counter.cycleShape(gate.shape))
     true
   }
 
