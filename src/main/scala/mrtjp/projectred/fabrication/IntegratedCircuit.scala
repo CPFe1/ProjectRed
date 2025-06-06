@@ -6,7 +6,7 @@
 package mrtjp.projectred.fabrication
 
 import codechicken.lib.data.{MCDataInput, MCDataOutput}
-import mrtjp.core.vec.{Point, Size}
+import mrtjp.core.vec.{Point, Rect, Size}
 import mrtjp.projectred.ProjectRedCore.log
 import mrtjp.projectred.fabrication.circuitparts.io.{IOGateICPart, TIOCircuitPart}
 import mrtjp.projectred.fabrication.circuitparts.{CircuitPart, TClientNetCircuitPart, TErrorCircuitPart}
@@ -238,6 +238,17 @@ class IntegratedCircuit {
     }
 
     errors = elist.result()
+  }
+
+  def getPartsBoundingBox(): Rect = {
+    val keys = parts.keys
+    val ((x2, y2), (x1, y1)) = if(keys.nonEmpty) {
+      (keys.reduce((p1, p2) => (math.max(p1._1, p2._1), math.max(p1._2, p2._2))),
+      keys.reduce((p1, p2) => (math.min(p1._1, p2._1), math.min(p1._2, p2._2))))
+    } else {
+      ((1, 1), (0, 0))
+    }
+    Rect(Point(x1, y1), Size(x2 - x1, y2 - y1))
   }
 
   def setPart(x: Int, y: Int, part: CircuitPart) {

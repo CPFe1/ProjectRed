@@ -9,7 +9,7 @@ import codechicken.lib.data.{MCDataInput, MCDataOutput}
 import codechicken.lib.render.uv.{UVScale, UVTranslation}
 import codechicken.lib.vec.Translation
 import cpw.mods.fml.relauncher.{Side, SideOnly}
-import mrtjp.core.vec.Point
+import mrtjp.core.vec.{Point, Vec2}
 import mrtjp.projectred.core.libmc.PRResources
 import mrtjp.projectred.fabrication.ICComponentStore._
 import mrtjp.projectred.fabrication.IntegratedCircuit
@@ -64,43 +64,21 @@ class CircuitOpErase extends CircuitOp {
   }
 
   @SideOnly(Side.CLIENT)
-  override def renderHover(
-      circuit: IntegratedCircuit,
-      point: Point,
-      rot: Int,
-      configuration: Int,
-      x: Double,
-      y: Double,
-      xSize: Double,
-      ySize: Double
-  ) {
-    if (circuit.getPart(point) != null)
-      CircuitOp.renderHolo(x, y, xSize, ySize, circuit.size, point, 0x33ff0000)
+  override def renderHover(circuit: IntegratedCircuit, position: Vec2, scale: Double, prefboardOffset: Vec2): Unit = {
+    CircuitOp.renderHolo(position - prefboardOffset, scale, 0x33ff0000)
   }
 
   @SideOnly(Side.CLIENT)
-  override def renderDrag(
-      circuit: IntegratedCircuit,
-      start: Point,
-      end: Point,
-      x: Double,
-      y: Double,
-      xSize: Double,
-      ySize: Double
-  ) {
-    for (px <- math.min(start.x, end.x) to math.max(start.x, end.x))
-      for (py <- math.min(start.y, end.y) to math.max(start.y, end.y)) {
-        val point = Point(px, py)
-        CircuitOp.renderHolo(
-          x,
-          y,
-          xSize,
-          ySize,
-          circuit.size,
-          point,
-          if (circuit.getPart(point) != null) 0x44ff0000 else 0x44ffffff
-        )
-      }
+  override def renderDrag(circuit: IntegratedCircuit, start: Vec2, end: Vec2, positionsWithParts: Seq[Vec2], scale: Double, prefboardOffset: Vec2): Unit = {
+    var (topLeft, bottomRight) = (
+      Vec2(math.min(start.dx, end.dx), math.min(start.dy, end.dy)).subtract(prefboardOffset),
+      Vec2(math.max(start.dx, end.dx), math.max(start.dy, end.dy)).subtract(prefboardOffset)
+    )
+    bottomRight = bottomRight.add(1, 1)
+    CircuitOp.renderHolo(topLeft, bottomRight, scale, 0x44ffffff)
+    for(posWithPart <- positionsWithParts) {
+      CircuitOp.renderHolo(posWithPart - prefboardOffset, scale, 0x44ff0000)
+    }
   }
 
   @SideOnly(Side.CLIENT)

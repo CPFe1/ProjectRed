@@ -22,12 +22,6 @@ abstract class OpGateCommons(meta: Int) extends CircuitOp {
 
   def getID: Int = meta
 
-  def canPlace(circuit: IntegratedCircuit, point: Point): Boolean
-  def findRot(circuit: IntegratedCircuit, start: Point, end: Point): Int
-
-  override def checkOp(circuit: IntegratedCircuit, start: Point, end: Point) =
-    canPlace(circuit, start) && circuit.getPart(start) == null
-
   override def getRotation(): Int = rotation
 
   override def getConfiguration(): Int = configuration
@@ -46,70 +40,32 @@ abstract class OpGateCommons(meta: Int) extends CircuitOp {
   }
 
   override def readOp(circuit: IntegratedCircuit, in: MCDataInput) {
-    val point = Point(in.readByte(), in.readByte())
+    val point = Vec2(in.readByte(), in.readByte())
     rotation = in.readUByte()
     configuration = in.readUByte()
 
-    if (circuit.getPart(point) == null && canPlace(circuit, point)) {
+    if (circuit.getPart(Point.apply(point)) == null && canPlace(circuit, point)) {
       val part = CircuitPart
         .createPart(ICGateDefinition(meta).gateType)
         .asInstanceOf[GateICPart]
       part.preparePlacement(rotation, configuration, meta)
-      circuit.setPart(point, part)
+      circuit.setPart(Point.apply(point), part)
     }
   }
 
   @SideOnly(Side.CLIENT)
-  override def renderHover(
-      circuit: IntegratedCircuit,
-      point: Point,
-      rot: Int,
-      configuration: Int,
-      x: Double,
-      y: Double,
-      xSize: Double,
-      ySize: Double
-  ) {
-    if (circuit.getPart(point) != null) return
-
-    val t = orthoPartT(x, y, xSize, ySize, circuit.size, point.x, point.y)
+  override def renderHover(circuit: IntegratedCircuit, position: Vec2, scale: Double, prefboardOffset: Vec2): Unit = {
+    val t = orthoPartT(position.subtract(prefboardOffset), scale)
     doRender(t, rotation, configuration)
-
-    renderHolo(
-      x,
-      y,
-      xSize,
-      ySize,
-      circuit.size,
-      point,
-      if (canPlace(circuit, point)) 0x33ffffff else 0x33ff0000
-    )
+    renderHolo(position.subtract(prefboardOffset), scale, if (canPlace(circuit, position)) 0x33ffffff else 0x33ff0000)
   }
 
   @SideOnly(Side.CLIENT)
-  override def renderDrag(
-      circuit: IntegratedCircuit,
-      start: Point,
-      end: Point,
-      x: Double,
-      y: Double,
-      xSize: Double,
-      ySize: Double
-  ) {
-    if (circuit.getPart(start) != null) return
-
-    val t = orthoPartT(x, y, xSize, ySize, circuit.size, start.x, start.y)
+  def renderDrag(circuit: IntegratedCircuit, start: Vec2, end: Vec2, positionsWithParts: Seq[Vec2], scale: Double, prefboardOffset: Vec2): Unit = {
+    // Gates can't be dragged, so only the first will be rendered
+    val t = orthoPartT(start - prefboardOffset, scale)
     doRender(t, rotation, configuration)
-
-    renderHolo(
-      x,
-      y,
-      xSize,
-      ySize,
-      circuit.size,
-      start,
-      if (canPlace(circuit, start)) 0x44ffffff else 0x44ff0000
-    )
+    renderHolo(start - prefboardOffset, scale, 0x44ffffff)
   }
 
   @SideOnly(Side.CLIENT)
@@ -138,33 +94,11 @@ abstract class OpGateCommons(meta: Int) extends CircuitOp {
 }
 
 class OpGate(meta: Int) extends OpGateCommons(meta) {
-  override def findRot(circuit: IntegratedCircuit, start: Point, end: Point) = {
-    (end - start).vectorize.axialProject.normalize match {
-      case Vec2(0, -1) => 0
-      case Vec2(1, 0)  => 1
-      case Vec2(0, 1)  => 2
-      case Vec2(-1, 0) => 3
-      case _           => 0
-    }
-  }
-
-  override def canPlace(circuit: IntegratedCircuit, point: Point) =
-    !isOnBorder(circuit.size, point)
+  override def canPlace(circuit: IntegratedCircuit, position: Vec2) =
+    !isOnBorder(circuit, position)
 }
 
 class OpIOGate(meta: Int) extends OpGateCommons(meta) {
-  override def canPlace(circuit: IntegratedCircuit, point: Point) =
-    isOnBorder(circuit.size, point) && !isOnEdge(circuit.size, point)
-
-  override def findRot(circuit: IntegratedCircuit, start: Point, end: Point) = {
-    val wm = circuit.size.width - 1
-    val hm = circuit.size.height - 1
-    start match {
-      case Point(_, 0)    => 0
-      case Point(`wm`, _) => 1
-      case Point(_, `hm`) => 2
-      case Point(0, _)    => 3
-      case _              => 0
-    }
-  }
+  override def canPlace(circuit: IntegratedCircuit, position: Vec2) =
+    isOnBorder(circuit, position) && !isOnEdge(circuit, position)
 }
