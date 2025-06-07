@@ -28,7 +28,7 @@ trait TFreqIOICGateLogic extends IOICGateLogic {
 
   override def read(in: MCDataInput, key: Int) = key match {
     case 12 => freq = in.readUByte()
-    case _ => super.read(in, key)
+    case _  => super.read(in, key)
   }
 
   def sendFreqUpdate() {
@@ -62,9 +62,9 @@ trait TFreqIOICGateLogic extends IOICGateLogic {
   override def setWorldOutput(state: Boolean) {
     val s =
       ((gate.world.iostate(gate.rotation) >>> 16) & ~(1 << freq)) | (if (state)
-        1
-      else
-        0) << freq
+                                                                       1
+                                                                     else
+                                                                       0) << freq
     gate.world.setOutput(gate.rotation, s)
   }
 }

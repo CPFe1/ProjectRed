@@ -4,7 +4,11 @@ import codechicken.lib.data.{MCDataInput, MCDataOutput}
 import mrtjp.core.vec.{Point, Rect, Size}
 import mrtjp.projectred.ProjectRedCore.log
 import mrtjp.projectred.fabrication.circuitparts.io.TIOCircuitPart
-import mrtjp.projectred.fabrication.circuitparts.{CircuitPart, TClientNetCircuitPart, TErrorCircuitPart}
+import mrtjp.projectred.fabrication.circuitparts.{
+  CircuitPart,
+  TClientNetCircuitPart,
+  TErrorCircuitPart
+}
 import mrtjp.projectred.fabrication.operations.CircuitOp
 import net.minecraft.nbt.{NBTTagCompound, NBTTagList}
 
@@ -21,8 +25,8 @@ class IntegratedCircuit {
   private var scheduledTicks = MMap[(Int, Int), Long]()
 
   /** Mapped inputs and outputs of this IC. Outputs go to the world, inputs come
-   * in from the world. OOOO OOOO OOOO OOOO IIII IIII IIII IIII
-   */
+    * in from the world. OOOO OOOO OOOO OOOO IIII IIII IIII IIII
+    */
   val iostate = Array(0, 0, 0, 0)
 
   var outputChangedDelegate = { () => () }
@@ -158,9 +162,9 @@ class IntegratedCircuit {
   }
 
   def sendClientPacket(
-                        part: TClientNetCircuitPart,
-                        writer: MCDataOutput => Unit
-                      ) {
+      part: TClientNetCircuitPart,
+      writer: MCDataOutput => Unit
+  ) {
     val s = network.getICStreamOf(4).writeInt(part.x).writeInt(part.y)
     writer(s)
   }
@@ -214,9 +218,15 @@ class IntegratedCircuit {
 
   def getPartsBoundingBox(): Rect = {
     val keys = parts.keys
-    val ((x2, y2), (x1, y1)) = if(keys.nonEmpty) {
-      (keys.reduce((p1, p2) => (math.max(p1._1, p2._1), math.max(p1._2, p2._2))),
-      keys.reduce((p1, p2) => (math.min(p1._1, p2._1), math.min(p1._2, p2._2))))
+    val ((x2, y2), (x1, y1)) = if (keys.nonEmpty) {
+      (
+        keys.reduce((p1, p2) =>
+          (math.max(p1._1, p2._1), math.max(p1._2, p2._2))
+        ),
+        keys.reduce((p1, p2) =>
+          (math.min(p1._1, p2._1), math.min(p1._2, p2._2))
+        )
+      )
     } else {
       ((1, 1), (0, 0))
     }

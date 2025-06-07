@@ -11,11 +11,9 @@ import mrtjp.projectred.fabrication.circuitparts.{CircuitPart, CircuitPartDefs}
 import mrtjp.projectred.fabrication.operations.CircuitOpDefs
 import net.minecraft.nbt.NBTTagCompound
 
-
 trait IInsulatedRedwireICPart extends IRedwireICPart {
   def getInsulatedColour: Int
 }
-
 
 class InsulatedWireICPart extends RedwireICPart with IInsulatedRedwireICPart {
   var colour: Byte = 0
@@ -44,13 +42,13 @@ class InsulatedWireICPart extends RedwireICPart with IInsulatedRedwireICPart {
 
   override def resolveSignal(part: Any, r: Int) = part match {
     case b: IBundledCableICPart => (b.getBundledSignal.apply(colour) & 0xff) - 1
-    case _ => super.resolveSignal(part, r)
+    case _                      => super.resolveSignal(part, r)
   }
 
   override def canConnectPart(part: CircuitPart, r: Int) = part match {
-    case b: IBundledCableICPart => true
+    case b: IBundledCableICPart  => true
     case iw: InsulatedWireICPart => iw.colour == colour
-    case _ => super.canConnectPart(part, r)
+    case _                       => super.canConnectPart(part, r)
   }
 
   override def getInsulatedColour = colour
@@ -70,8 +68,6 @@ class InsulatedWireICPart extends RedwireICPart with IInsulatedRedwireICPart {
       .values(CircuitOpDefs.WhiteInsulatedWire.ordinal + colour)
       .getOp
 }
-
-
 
 object RenderICInsulatedWire {
   var connMap: Byte = 0
@@ -105,4 +101,3 @@ object RenderICInsulatedWire {
     finishRender()
   }
 }
-

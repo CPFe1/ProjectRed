@@ -3,8 +3,18 @@ package mrtjp.projectred.fabrication.circuitparts.timing
 import codechicken.lib.math.MathHelper
 import mrtjp.projectred.core.TFaceOrient.flipMaskZ
 import mrtjp.projectred.fabrication.ICComponentStore.generateWireModels
-import mrtjp.projectred.fabrication.circuitparts.{ICGateRenderer, SequentialGateICPart, SequentialICGateLogic, TExtraStateLogic}
-import mrtjp.projectred.fabrication.{BaseComponentModel, PointerModel, RedChipModel, RedstoneTorchModel}
+import mrtjp.projectred.fabrication.circuitparts.{
+  ICGateRenderer,
+  SequentialGateICPart,
+  SequentialICGateLogic,
+  TExtraStateLogic
+}
+import mrtjp.projectred.fabrication.{
+  BaseComponentModel,
+  PointerModel,
+  RedChipModel,
+  RedstoneTorchModel
+}
 
 object StateCell {
   def cycleShape(shape: Int): Int = {
@@ -12,9 +22,8 @@ object StateCell {
   }
 }
 
-
 class StateCell(gate: SequentialGateICPart)
-  extends SequentialICGateLogic(gate)
+    extends SequentialICGateLogic(gate)
     with TTimerGateLogic
     with TExtraStateLogic {
   override def outputMask(shape: Int) = {
@@ -74,7 +83,6 @@ class StateCell(gate: SequentialGateICPart)
     gate.onOutputChange(outputMask(gate.shape))
   }
 }
-
 
 class RenderStateCell extends ICGateRenderer[SequentialGateICPart] {
   val wires = generateWireModels("STATECELL", 5)

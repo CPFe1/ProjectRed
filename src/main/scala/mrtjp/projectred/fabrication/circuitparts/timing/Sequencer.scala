@@ -5,10 +5,18 @@ import codechicken.lib.math.MathHelper
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import mrtjp.projectred.core.Configurator
 import mrtjp.projectred.core.TFaceOrient.flipMaskZ
-import mrtjp.projectred.fabrication.circuitparts.{GateICPart, ICGateRenderer, SequentialGateICPart, SequentialICGateLogic}
-import mrtjp.projectred.fabrication.{BaseComponentModel, PointerModel, RedstoneTorchModel}
+import mrtjp.projectred.fabrication.circuitparts.{
+  GateICPart,
+  ICGateRenderer,
+  SequentialGateICPart,
+  SequentialICGateLogic
+}
+import mrtjp.projectred.fabrication.{
+  BaseComponentModel,
+  PointerModel,
+  RedstoneTorchModel
+}
 import net.minecraft.nbt.NBTTagCompound
-
 
 object Sequencer {
   def cycleShape(shape: Int): Int = {
@@ -17,7 +25,7 @@ object Sequencer {
 }
 
 class Sequencer(gate: SequentialGateICPart)
-  extends SequentialICGateLogic(gate)
+    extends SequentialICGateLogic(gate)
     with ITimerGuiLogic {
   var pointer_max = 40
   var saveTime = -1L
@@ -86,7 +94,6 @@ class Sequencer(gate: SequentialGateICPart)
     super.getRolloverData(gate, detailLevel) ++ data.result()
   }
 }
-
 
 class RenderSequencer extends ICGateRenderer[SequentialGateICPart] {
   val torches = Seq(
