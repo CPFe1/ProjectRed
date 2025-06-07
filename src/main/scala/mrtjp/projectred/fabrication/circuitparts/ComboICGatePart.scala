@@ -10,5 +10,6 @@ class ComboICGatePart extends RedstoneGateICPart with TConfigurable {
 
   override def getPartType = CircuitPartDefs.SimpleGate
 
-  override def createConfigurationNode: ConfigurationNode = new ConfigurationRotationConfig(this)
+  override def createConfigurationNode: ConfigurationNode =
+    new ConfigurationRotationConfig(this)
 }

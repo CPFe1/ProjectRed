@@ -2,12 +2,20 @@ package mrtjp.projectred.fabrication.circuitparts.misc
 
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import mrtjp.projectred.fabrication.ICComponentStore.generateWireModels
-import mrtjp.projectred.fabrication.circuitparts.{ICGateRenderer, SequentialGateICPart, SequentialICGateLogic, TExtraStateLogic}
-import mrtjp.projectred.fabrication.{BaseComponentModel, RedChipModel, RedstoneTorchModel}
-
+import mrtjp.projectred.fabrication.circuitparts.{
+  ICGateRenderer,
+  SequentialGateICPart,
+  SequentialICGateLogic,
+  TExtraStateLogic
+}
+import mrtjp.projectred.fabrication.{
+  BaseComponentModel,
+  RedChipModel,
+  RedstoneTorchModel
+}
 
 class Synchronizer(gate: SequentialGateICPart)
-  extends SequentialICGateLogic(gate)
+    extends SequentialICGateLogic(gate)
     with TExtraStateLogic {
   override def outputMask(shape: Int) = 1
   override def inputMask(shape: Int) = 14
@@ -61,7 +69,6 @@ class Synchronizer(gate: SequentialGateICPart)
     super.getRolloverData(gate, detailLevel) ++ data.result()
   }
 }
-
 
 class RenderSynchronizer extends ICGateRenderer[SequentialGateICPart] {
   val wires = generateWireModels("SYNC", 6)
