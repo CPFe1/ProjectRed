@@ -5,7 +5,7 @@ import mrtjp.core.color.Colors
 import mrtjp.core.gui.TNode
 import mrtjp.core.vec.{Point, Rect, Size}
 
-class ColorPicker(onPickColor: Int => Unit) extends TNode {
+class ColorPicker(var color: Int, onPickColor: Int => Unit) extends TNode {
 
   var size = Size.zeroSize
 
@@ -15,13 +15,36 @@ class ColorPicker(onPickColor: Int => Unit) extends TNode {
     val edge = size.width / 4
 
     for (i <- 0 to 15) {
-      GuiDraw.drawRect(
-        position.x + (i % 4) * edge,
-        position.y + (i / 4) * edge,
-        edge,
-        edge,
-        Colors(i).argb
-      )
+      // Top Left Corner
+      val x = position.x + (i % 4) * edge
+      val y = position.y + (i / 4) * edge
+
+      if (i != color) {
+        GuiDraw.drawRect(
+          x,
+          y,
+          edge,
+          edge,
+          Colors(i).argb
+        )
+      } else {
+        // Border
+        GuiDraw.drawRect(
+          x,
+          y,
+          edge,
+          edge,
+          0xffff7777
+        )
+        // Color
+        GuiDraw.drawRect(
+          x + 2,
+          y + 2,
+          edge - 4,
+          edge - 4,
+          Colors(i).argb
+        )
+      }
     }
   }
 
@@ -34,7 +57,8 @@ class ColorPicker(onPickColor: Int => Unit) extends TNode {
       val relPos = p.subtract(position)
       val index =
         (relPos.y / (size.height / 4)) * 4 + relPos.x / (size.width / 4)
-      onPickColor(index)
+      color = index
+      onPickColor(color)
       true
     } else
       false
