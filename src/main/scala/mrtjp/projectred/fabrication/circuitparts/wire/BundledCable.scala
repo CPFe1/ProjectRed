@@ -189,7 +189,7 @@ class BundledCableICPart
                               else "") + "Bundled cable"
 
   @SideOnly(Side.CLIENT)
-  override def getPickOp = CircuitOpDefs
+  override def getCircuitOperation = CircuitOpDefs
     .values(CircuitOpDefs.NeutralBundledCable.ordinal + colour + 1)
     .getOp
 
